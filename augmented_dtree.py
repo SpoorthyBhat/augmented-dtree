@@ -54,9 +54,9 @@ class DTree(object):
 				 num_classes=self.num_classes, epochs=epochs_per_node, batch_size=batch_size))
 			curr_node.set_child_id_start(len(self.nodes))
 			if self.data_balance:
-				# FIX
-				# databalance(input=os.path.join(base,'data_{}.csv'.format(i)), output=os.path.join(base,'b_data_{}.csv'.format(i)))
-				pass
+				db = DataBalance(os.path.join(base,'data_{}.csv'.format(i)) )
+				db.data_balance(os.path.join(base,'b_data_{}.csv'.format(i)))
+				
 			child_list = curr_node.train()
 			curr_node.save_node_params(model_save_path)
 
