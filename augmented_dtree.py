@@ -2,6 +2,7 @@ import os
 from augmented_dtree_node import DTNode
 from classifiers.classifier import Classifier
 from classifiers.perceptron import Perceptron
+from dataBalancing import DataBalance
 
 class DTree(object):
 	"""DTree class to store tree structure"""
