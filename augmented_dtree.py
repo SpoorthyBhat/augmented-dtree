@@ -2,12 +2,13 @@ import os
 from augmented_dtree_node import DTNode
 from classifiers.classifier import Classifier
 from classifiers.perceptron import Perceptron
+from classifiers.C45 import C45
 from dataBalancing import DataBalance
 
 class DTree(object):
 	"""DTree class to store tree structure"""
 	
-	def __init__(self, num_classes, num_child, max_depth, data_type, data_dimension, data_balance):
+	def __init__(self, num_classes, num_child, max_depth, data_type, data_dimension, data_balance, decision_type):
 		"""
 		Arguments:
 		num_classes: Number of classes in data
@@ -16,6 +17,7 @@ class DTree(object):
 		data_type:	One of {'numeric','image'}
 		data_dimension:	Number of features in data; int for numeric , tuple of ints for image
 		data_balance: Bool (whether to use data_balancing)
+		decision_type: Classifier to be used
 		"""
 		super(DTree, self).__init__()
 		self.num_classes = num_classes
@@ -24,12 +26,16 @@ class DTree(object):
 		self.data_type = data_type
 		self.data_dimension = data_dimension
 		self.data_balance = data_balance
-		if self.data_type == 'numeric' and self.num_classes>2:
-			self.decision_type = Perceptron
-		else:
-			raise NotImplementedError('Feature not implemented')
+		self.decision_type = decision_type
 		self.nodes = []
 		self.built = False
+		
+		#if self.data_type == 'numeric' and self.num_classes>2:
+		#	self.decision_type = Perceptron
+		#else:
+		#	raise NotImplementedError('Feature not implemented')
+		
+		
 
 	def train(self, data_file, epochs_per_node, batch_size, model_save_path):
 		"""
@@ -55,8 +61,10 @@ class DTree(object):
 				 num_classes=self.num_classes, epochs=epochs_per_node, batch_size=batch_size))
 			curr_node.set_child_id_start(len(self.nodes))
 			if self.data_balance:
+				# FIX
 				db = DataBalance(os.path.join(base,'data_{}.csv'.format(i)) )
 				db.data_balance(os.path.join(base,'b_data_{}.csv'.format(i)))
+				# databalance(input=os.path.join(base,'data_{}.csv'.format(i)), output=os.path.join(base,'b_data_{}.csv'.format(i)))
 				
 			child_list = curr_node.train()
 			curr_node.save_node_params(model_save_path)
@@ -90,3 +98,4 @@ class DTree(object):
 			structure[i.node_id] = i.child_id
 		with open(os.path.join(model_save_file), 'wb') as savefile:
 			pickle.dump(structure, savefile, protocol=pickle.HIGHEST_PROTOCOL)
+
